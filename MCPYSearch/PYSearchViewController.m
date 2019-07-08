@@ -204,6 +204,9 @@
 {
     [super viewWillAppear:animated];
     
+    // Fixed search history view may not be displayed or other problem at the first time.
+    [self setSearchHistoryStyle:self.searchHistoryStyle];  // in method viewDidAppear，the view flashes when searchHistory count > 0
+    
     if (self.cancelButtonWidth == 0) { // Just adapt iOS 11.2
         [self viewDidLayoutSubviews];
     }
@@ -235,7 +238,7 @@
     [super viewDidAppear:animated];
     
     // Fixed search history view may not be displayed or other problem at the first time.
-    [self setSearchHistoryStyle:self.searchHistoryStyle];
+//    [self setSearchHistoryStyle:self.searchHistoryStyle];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -327,9 +330,12 @@
     if (!_emptyButton) {
         UIButton *emptyButton = [[UIButton alloc] init];
         emptyButton.titleLabel.font = self.searchHistoryHeader.font;
-        [emptyButton setTitleColor:PYTextColor forState:UIControlStateNormal];
-        [emptyButton setTitle:[NSBundle py_localizedStringForKey:PYSearchEmptyButtonText] forState:UIControlStateNormal];
-        [emptyButton setImage:[NSBundle py_imageNamed:@"empty"] forState:UIControlStateNormal];
+//        [emptyButton setTitleColor:PYTextColor forState:UIControlStateNormal];
+//        [emptyButton setTitle:[NSBundle py_localizedStringForKey:PYSearchEmptyButtonText] forState:UIControlStateNormal];
+//        [emptyButton setImage:[NSBundle py_imageNamed:@"empty"] forState:UIControlStateNormal];
+        [emptyButton setTitle:@"清空历史记录" forState:UIControlStateNormal];
+        [emptyButton setTitleColor:RGBCOLOR(69, 69, 69, 1) forState:UIControlStateNormal];
+        emptyButton.titleLabel.font = [UIFont systemFontOfSize:12];
         [emptyButton addTarget:self action:@selector(emptySearchHistoryDidClick) forControlEvents:UIControlEventTouchUpInside];
         [emptyButton sizeToFit];
         emptyButton.py_width += PYSEARCH_MARGIN;
@@ -455,6 +461,7 @@
     UIView *titleView = [[UIView alloc] init];
     UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:titleView.bounds];
     [titleView addSubview:searchBar];
+    // 设置搜索结果列表图标
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 11.0) { // iOS 11
         [NSLayoutConstraint activateConstraints:@[
                                                   [searchBar.topAnchor constraintEqualToAnchor:titleView.topAnchor],
@@ -472,7 +479,8 @@
     for (UIView *subView in [[searchBar.subviews lastObject] subviews]) {
         if ([[subView class] isSubclassOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *)subView;
-            textField.font = [UIFont systemFontOfSize:16];
+            textField.font = [UIFont systemFontOfSize:14];
+            textField.textColor = RGBCOLOR(69, 69, 69, 1);
             _searchTextField = textField;
             break;
         }
@@ -644,15 +652,15 @@
         
         // set tag's background color and text color
         switch (i) {
-            case 0: // NO.1
+                case 0: // NO.1
                 rankTag.backgroundColor = [UIColor py_colorWithHexString:self.rankTagBackgroundColorHexStrings[0]];
                 rankTag.textColor = [UIColor whiteColor];
                 break;
-            case 1: // NO.2
+                case 1: // NO.2
                 rankTag.backgroundColor = [UIColor py_colorWithHexString:self.rankTagBackgroundColorHexStrings[1]];
                 rankTag.textColor = [UIColor whiteColor];
                 break;
-            case 2: // NO.3
+                case 2: // NO.3
                 rankTag.backgroundColor = [UIColor py_colorWithHexString:self.rankTagBackgroundColorHexStrings[2]];
                 rankTag.textColor = [UIColor whiteColor];
                 break;
@@ -943,7 +951,7 @@
     [self setupSearchHistoryTags];
     
     switch (searchHistoryStyle) {
-        case PYSearchHistoryStyleColorfulTag:
+            case PYSearchHistoryStyleColorfulTag:
             for (UILabel *tag in self.searchHistoryTags) {
                 tag.textColor = [UIColor whiteColor];
                 tag.layer.borderColor = nil;
@@ -951,14 +959,14 @@
                 tag.backgroundColor = PYSEARCH_COLORPolRandomColor;
             }
             break;
-        case PYSearchHistoryStyleBorderTag:
+            case PYSearchHistoryStyleBorderTag:
             for (UILabel *tag in self.searchHistoryTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
                 tag.layer.borderWidth = 0.5;
             }
             break;
-        case PYSearchHistoryStyleARCBorderTag:
+            case PYSearchHistoryStyleARCBorderTag:
             for (UILabel *tag in self.searchHistoryTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
@@ -976,7 +984,7 @@
     _hotSearchStyle = hotSearchStyle;
     
     switch (hotSearchStyle) {
-        case PYHotSearchStyleColorfulTag:
+            case PYHotSearchStyleColorfulTag:
             for (UILabel *tag in self.hotSearchTags) {
                 tag.textColor = [UIColor whiteColor];
                 tag.layer.borderColor = nil;
@@ -984,14 +992,14 @@
                 tag.backgroundColor = PYSEARCH_COLORPolRandomColor;
             }
             break;
-        case PYHotSearchStyleBorderTag:
+            case PYHotSearchStyleBorderTag:
             for (UILabel *tag in self.hotSearchTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
                 tag.layer.borderWidth = 0.5;
             }
             break;
-        case PYHotSearchStyleARCBorderTag:
+            case PYHotSearchStyleARCBorderTag:
             for (UILabel *tag in self.hotSearchTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
@@ -999,10 +1007,10 @@
                 tag.layer.cornerRadius = tag.py_height * 0.5;
             }
             break;
-        case PYHotSearchStyleRectangleTag:
+            case PYHotSearchStyleRectangleTag:
             self.hotSearches = self.hotSearches;
             break;
-        case PYHotSearchStyleRankTag:
+            case PYHotSearchStyleRankTag:
             self.rankTagBackgroundColorHexStrings = nil;
             break;
             
@@ -1144,11 +1152,11 @@
 - (void)handleSearchResultShow
 {
     switch (self.searchResultShowMode) {
-        case PYSearchResultShowModePush:
+            case PYSearchResultShowModePush:
             self.searchResultController.view.hidden = NO;
             [self.navigationController pushViewController:self.searchResultController animated:YES];
             break;
-        case PYSearchResultShowModeEmbed:
+            case PYSearchResultShowModeEmbed:
             if (self.searchResultController) {
                 [self.view addSubview:self.searchResultController.view];
                 [self addChildViewController:self.searchResultController];
@@ -1160,7 +1168,7 @@
                 PYSEARCH_LOG(@"PYSearchDebug： searchResultController cannot be nil when searchResultShowMode is PYSearchResultShowModeEmbed.");
             }
             break;
-        case PYSearchResultShowModeCustom:
+            case PYSearchResultShowModeCustom:
             
             break;
         default:
@@ -1353,3 +1361,4 @@
 }
 
 @end
+

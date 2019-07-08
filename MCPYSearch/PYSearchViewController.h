@@ -321,7 +321,7 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The search bar
  */
-@property (nonatomic, weak) UISearchBar *searchBar;
+@property (nonatomic, strong) UISearchBar *searchBar;
 
 /**
  The text field of search bar
